@@ -1,0 +1,10 @@
+.rebar3
+_build
+_checkouts
+_vendor
+.eunit
+*.o
+*.beam
+*.plt
+erl_crash.dump
+rebar3.crashdump

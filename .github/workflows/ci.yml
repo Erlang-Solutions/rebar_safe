@@ -1,0 +1,138 @@
+name: CI
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+
+jobs:
+  format:
+    name: Format
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: erlef/setup-beam@v1
+        with:
+          otp-version: '27'
+          rebar3-version: '3.24.0'
+
+      - name: Restore dependencies cache
+        uses: actions/cache@v4
+        with:
+          path: |
+            ~/.cache/rebar3
+            _build
+          key: ${{ runner.os }}-otp-27-rebar3-3.24.0-${{ hashFiles('rebar.lock') }}
+          restore-keys: |
+            ${{ runner.os }}-otp-27-rebar3-3.24.0-
+
+      - name: Compile
+        run: rebar3 compile
+
+      - name: Check formatting
+        run: rebar3 fmt --check
+
+  dialyzer:
+    name: Dialyzer
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: erlef/setup-beam@v1
+        with:
+          otp-version: '27'
+          rebar3-version: '3.24.0'
+
+      - name: Restore dependencies cache
+        uses: actions/cache@v4
+        with:
+          path: |
+            ~/.cache/rebar3
+            _build
+          key: ${{ runner.os }}-otp-27-rebar3-3.24.0-${{ hashFiles('rebar.lock') }}
+          restore-keys: |
+            ${{ runner.os }}-otp-27-rebar3-3.24.0-
+
+      - name: Compile
+        run: rebar3 compile
+
+      - name: Restore Dialyzer PLT cache
+        uses: actions/cache@v4
+        with:
+          path: _build/default/*_plt*
+          key: ${{ runner.os }}-otp-27-plt-${{ hashFiles('rebar.lock') }}
+          restore-keys: |
+            ${{ runner.os }}-otp-27-plt-
+
+      - name: Run Dialyzer
+        run: rebar3 dialyzer
+
+  test:
+    name: OTP ${{ matrix.otp }} / ${{ matrix.os }}
+    runs-on: ${{ matrix.os }}
+    strategy:
+      fail-fast: false
+      matrix:
+        otp: ['25', '26', '27', '28']
+        os: [ubuntu-latest, macos-latest]
+        include:
+          # arm64 Linux — aarch64
+          - os: ubuntu-24.04-arm
+            otp: '27'
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: erlef/setup-beam@v1
+        with:
+          otp-version: ${{ matrix.otp }}
+          rebar3-version: '3.24.0'
+
+      - name: Restore dependencies cache
+        uses: actions/cache@v4
+        with:
+          path: |
+            ~/.cache/rebar3
+            _build
+          key: ${{ runner.os }}-otp-${{ matrix.otp }}-rebar3-3.24.0-${{ hashFiles('rebar.lock') }}
+          restore-keys: |
+            ${{ runner.os }}-otp-${{ matrix.otp }}-rebar3-3.24.0-
+
+      - name: Compile
+        run: rebar3 compile
+
+      - name: Run tests with coverage
+        run: rebar3 eunit --cover
+
+      - name: Enforce coverage
+        run: rebar3 cover --min_coverage=40
+
+  integration-test:
+    name: Integration / ${{ matrix.os }}
+    runs-on: ${{ matrix.os }}
+    strategy:
+      fail-fast: false
+      matrix:
+        os: [ubuntu-latest, macos-15-intel, macos-latest]
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: erlef/setup-beam@v1
+        with:
+          otp-version: '27'
+          rebar3-version: '3.24.0'
+
+      - name: Restore dependencies cache
+        uses: actions/cache@v4
+        with:
+          path: |
+            ~/.cache/rebar3
+            _build
+          key: ${{ runner.os }}-otp-27-rebar3-3.24.0-${{ hashFiles('rebar.lock') }}
+          restore-keys: |
+            ${{ runner.os }}-otp-27-rebar3-3.24.0-
+
+      - name: Run integration tests
+        run: python3 scripts/integration_test.py -v

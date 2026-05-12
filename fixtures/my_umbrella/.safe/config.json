@@ -1,0 +1,26 @@
+{
+  "output": [
+    "stdio",
+    "file"
+  ],
+  "version": "1.1",
+  "project": {
+    "name": "my_umbrella",
+    "type": "beam",
+    "paths": [
+      "_build/default/lib"
+    ],
+    "apps": [
+      {
+        "name": "foo",
+        "app_file": "_build/default/lib/foo/ebin/foo.app",
+        "additional_includes": []
+      },
+      {
+        "name": "bar",
+        "app_file": "_build/default/lib/bar/ebin/bar.app",
+        "additional_includes": []
+      }
+    ]
+  }
+}
