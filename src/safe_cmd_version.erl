@@ -17,7 +17,7 @@ handle(State, Dir) ->
 %%====================================================================
 
 resolve_plugin_version() ->
-    case application:get_key(safe, vsn) of
+    case application:get_key(rebar_safe, vsn) of
         {ok, V} -> V;
         undefined -> "unknown"
     end.

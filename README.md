@@ -1,4 +1,5 @@
-<h1>
+# SAFE - Security Analysis For Erlang
+<br>
 <picture style="margin-right: 15px; float: left;">
   <source
     media="(prefers-color-scheme: dark)"
@@ -19,8 +20,6 @@
     align="left"
   />
 </picture>
-  Security Analysis For Erlang
-</h1>
 
 A rebar3 plugin that wires [SAFE](https://safe-docs.erlang-solutions.com/)
 — Erlang/Elixir security scanner from Erlang Solutions — directly
@@ -46,7 +45,7 @@ Add the plugin to your project's `rebar.config`:
 
 ```erlang
 {plugins, [
-    {safe, {git, "https://github.com/Erlang-Solutions/rebar_safe.git", {branch, "main"}}}
+  {rebar_safe, "1.0.1"}
 ]}.
 ```
 

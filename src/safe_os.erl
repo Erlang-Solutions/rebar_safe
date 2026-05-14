@@ -1,5 +1,3 @@
--module(safe_os).
-
 %% @doc
 %% Port-based process execution — no shell, ever — args list only.
 %%
@@ -7,6 +5,8 @@
 %% args list. Output is forwarded to standard_io as it arrives; only
 %% the exit code is returned.
 %% @end
+
+-module(safe_os).
 
 -export([shell_passthrough/3]).
 

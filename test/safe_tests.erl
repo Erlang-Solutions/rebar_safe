@@ -9,7 +9,7 @@ main_plugin_test() ->
 
     try
         State = rebar_state:new(),
-        Result = safe:init(State),
+        Result = rebar_safe:init(State),
         ?assertMatch({ok, _}, Result),
         ?assert(meck:called(safe_prv, init, ['_']))
     after

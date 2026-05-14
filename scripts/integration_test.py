@@ -39,19 +39,19 @@ def rebar3_safe(fixture_name, *args, timeout=120):
 
 
 def setup_checkouts(fixture_name):
-    """Create _checkouts/safe symlink so the fixture uses the local plugin."""
+    """Create _checkouts/rebar_safe symlink so the fixture uses the local plugin."""
     fixture_dir = os.path.join(FIXTURES_DIR, fixture_name)
     checkouts_dir = os.path.join(fixture_dir, "_checkouts")
-    symlink_path = os.path.join(checkouts_dir, "safe")
+    symlink_path = os.path.join(checkouts_dir, "rebar_safe")
     os.makedirs(checkouts_dir, exist_ok=True)
     if not os.path.islink(symlink_path):
         os.symlink("../../..", symlink_path)
 
 
 def cleanup_checkouts(fixture_name):
-    """Remove _checkouts/safe symlink."""
+    """Remove _checkouts/rebar_safe symlink."""
     fixture_dir = os.path.join(FIXTURES_DIR, fixture_name)
-    symlink_path = os.path.join(fixture_dir, "_checkouts", "safe")
+    symlink_path = os.path.join(fixture_dir, "_checkouts", "rebar_safe")
     if os.path.islink(symlink_path):
         os.remove(symlink_path)
     checkouts_dir = os.path.join(fixture_dir, "_checkouts")
