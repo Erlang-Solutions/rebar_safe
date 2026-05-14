@@ -1,4 +1,4 @@
--module(safe).
+-module(rebar_safe).
 
 -export([init/1]).
 
