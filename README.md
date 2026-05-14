@@ -45,7 +45,7 @@ Add the plugin to your project's `rebar.config`:
 
 ```erlang
 {plugins, [
-  {rebar_safe, {git, "https://github.com/Erlang-Solutions/rebar_safe.git", {branch, "main"}}}
+  {rebar_safe, "1.0.1"}
 ]}.
 ```
 
