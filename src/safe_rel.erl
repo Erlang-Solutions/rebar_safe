@@ -32,7 +32,8 @@ fetch_versions() ->
     end.
 
 %% @doc Get latest version satisfying a constraint, optionally including prereleases.
-%% Constraint format: <<"~> 1.3">> (>= 1.3.0, < 2.0.0) or <<"~> 1.3.1">> (>= 1.3.1, < 1.4.0)
+%% Constraint format: &lt;&lt;"~&gt; 1.3"&gt;&gt; (&gt;= 1.3.0, &lt; 2.0.0)
+%% or &lt;&lt;"~&gt; 1.3.1"&gt;&gt; (&gt;= 1.3.1, &lt; 1.4.0)
 -spec get_latest_compatible_version(Constraint :: binary()) ->
     {ok, binary(), map()} | {error, term()}.
 get_latest_compatible_version(Constraint) ->
@@ -268,7 +269,7 @@ constraint_requires_prerelease(ConstraintStr) ->
         _ -> true
     end.
 
-%% @doc Returns true if version contains a prerelease tag (e.g. <<"1.4.0-rc1">>).
+%% @doc Returns true if version contains a prerelease tag (e.g. &lt;&lt;"1.4.0-rc1"&gt;&gt;).
 -spec is_prerelease(binary()) -> boolean().
 is_prerelease(Version) ->
     case samovar:prerelease(binary_to_list(Version)) of
