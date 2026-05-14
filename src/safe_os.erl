@@ -8,7 +8,6 @@
 
 -module(safe_os).
 
-
 -export([shell_passthrough/3]).
 
 -export_type([shell_options/0, exit_code/0]).

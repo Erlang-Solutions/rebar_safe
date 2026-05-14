@@ -11,7 +11,7 @@ main_plugin_test() ->
         State = rebar_state:new(),
         Result = rebar_safe:init(State),
         ?assertMatch({ok, _}, Result),
-        ?assert(meck:called(rebar_safe, init, ['_']))
+        ?assert(meck:called(safe_prv, init, ['_']))
     after
         meck:unload(safe_prv)
     end.
