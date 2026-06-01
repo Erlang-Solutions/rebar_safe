@@ -234,6 +234,59 @@ analyse_uses_existing_config_test() ->
     end.
 
 %%====================================================================
+%% SCA command tests
+%%====================================================================
+
+sca_success_test() ->
+    setup_mocks("sca", binary_exists),
+    meck:expect(safe_runner, sca, fun(_Dir, _ExtraArgs) -> ok end),
+    try
+        State = rebar_state:new(),
+        {ok, State1} = safe_prv:init(State),
+        Result = safe_prv:do(State1),
+        ?assertMatch({ok, _}, Result),
+        ?assert(meck:called(safe_runner, sca, ['_', '_']))
+    after
+        teardown_mocks()
+    end.
+
+sca_vulnerabilities_found_test() ->
+    setup_mocks("sca", binary_exists),
+    meck:expect(safe_runner, sca, fun(_Dir, _ExtraArgs) -> {error, {sca, 2}} end),
+    try
+        State = rebar_state:new(),
+        {ok, State1} = safe_prv:init(State),
+        Result = safe_prv:do(State1),
+        ?assertMatch({error, _}, Result)
+    after
+        teardown_mocks()
+    end.
+
+sca_warnings_as_errors_test() ->
+    setup_mocks("sca", binary_exists),
+    meck:expect(safe_runner, sca, fun(_Dir, _ExtraArgs) -> {error, {sca, 3}} end),
+    try
+        State = rebar_state:new(),
+        {ok, State1} = safe_prv:init(State),
+        Result = safe_prv:do(State1),
+        ?assertMatch({error, _}, Result)
+    after
+        teardown_mocks()
+    end.
+
+sca_failure_test() ->
+    setup_mocks("sca", binary_exists),
+    meck:expect(safe_runner, sca, fun(_Dir, _ExtraArgs) -> {error, {sca, 1}} end),
+    try
+        State = rebar_state:new(),
+        {ok, State1} = safe_prv:init(State),
+        Result = safe_prv:do(State1),
+        ?assertMatch({error, _}, Result)
+    after
+        teardown_mocks()
+    end.
+
+%%====================================================================
 %% Download command tests
 %%====================================================================
 
@@ -383,6 +436,18 @@ format_error_config_write_error_test() ->
 
 format_error_version_failed_test() ->
     R = safe_prv:format_error({version_failed, 1}),
+    ?assert(lists:flatten(R) =/= []).
+
+format_error_sca_vulnerabilities_found_test() ->
+    R = safe_prv:format_error(sca_vulnerabilities_found),
+    ?assert(R =/= []).
+
+format_error_sca_warnings_as_errors_test() ->
+    R = safe_prv:format_error({sca_warnings_as_errors, 3}),
+    ?assert(R =/= []).
+
+format_error_sca_failed_test() ->
+    R = safe_prv:format_error({sca_failed, 1}),
     ?assert(lists:flatten(R) =/= []).
 
 %%====================================================================
