@@ -32,7 +32,7 @@ structure to build a config, and then hands off to SAFE for the actual analysis.
 
 ## Features 
 
-- A `rebar3 safe` command with `fingerprint`, `analyse`, `download`,
+- A `rebar3 safe` command with `fingerprint`, `analyse`, `sca`, `download`,
   `version`, and `help` subcommands.
 - Automatic binary download and SHA256 checksum verification.
 - Project inspection that handles plain apps and umbrella projects.
@@ -45,12 +45,26 @@ Add the plugin to your project's `rebar.config`:
 
 ```erlang
 {plugins, [
-  {rebar_safe, "1.0.2"}
+  {rebar_safe, "1.1.0"}
 ]}.
 ```
 
 The first time you invoke `rebar3 safe <task>` the plugin
 will fetch the SAFE binary into `_build/safe/` and cache it there.
+
+## Licensing
+
+| Capability | License requirement | Cost |
+|------------|---------------------|------|
+| `fingerprint` + `analyse` | Requires a SAFE license | Free for open source projects |
+| `sca` | No license required | Free for everyone |
+
+The `analyse` phase (and the `fingerprint` step that feeds it) runs the full
+SAFE static analysis engine, which requires a SAFE license. The license is free
+for open source projects — reach out at <safe@erlang-solutions.com>.
+
+Dependency scanning via `sca` is completely free for everyone and needs no
+license.
 
 ## Usage
 
@@ -76,6 +90,28 @@ rebar3 safe analyse
 
 The analysis exits non-zero if vulnerabilities are found, so it integrates
 cleanly with common CI providers.
+
+### Dependency vulnerability scanning (SCA)
+
+Scan your `rebar.lock` (or `mix.lock`) for known CVEs using the
+[mirego/elixir-security-advisories](https://github.com/mirego/elixir-security-advisories) database:
+
+```bash
+rebar3 safe sca
+```
+
+No license or fingerprint required — SCA works out of the box. The advisory
+database is cached locally (`~/.safe/advisories/`) after the first run.
+
+Optional flags are forwarded directly to the SAFE binary:
+
+```bash
+rebar3 safe sca --warnings-as-errors      # Exit non-zero on non-hex deps too
+rebar3 safe sca --lock-file ./rebar.lock  # Explicit lock file path
+rebar3 safe sca --ignore-file .safe/sca_ignore.json  # Custom ignore list
+```
+
+Exits 0 (clean), 2 (vulnerabilities found), or 3 (warnings as errors).
 
 ### Other tasks
 
