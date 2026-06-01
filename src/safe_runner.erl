@@ -59,7 +59,7 @@ config_spec_to_args({config_json, Json}) -> ["--config-json", Json].
 -spec safe_exe_and_dir(string()) -> {string(), string()}.
 safe_exe_and_dir(ProjectDir) ->
     SafeExe = ensure_string(safe_rel:get_safe_binary_path(ProjectDir)),
-    Dir = filename:dirname(SafeExe),
+    Dir = ensure_string(filename:dirname(SafeExe)),
     {SafeExe, Dir}.
 
 debug_print_command(SafeExe, Args) ->

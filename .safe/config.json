@@ -1,0 +1,21 @@
+{
+  "output": [
+    "stdio",
+    "file"
+  ],
+  "version": "1.1",
+  "project": {
+    "name": "rebar_safe",
+    "type": "beam",
+    "paths": [
+      "_build/default/lib/rebar_safe/ebin"
+    ],
+    "apps": [
+      {
+        "name": "rebar_safe",
+        "app_file": "_build/default/lib/rebar_safe/ebin/rebar_safe.app",
+        "additional_includes": []
+      }
+    ]
+  }
+}
