@@ -94,6 +94,19 @@ def setUpModule():
         raise RuntimeError("Plugin compilation failed")
     for fixture in FIXTURES:
         setup_checkouts(fixture)
+    print("Compiling fixture projects...")
+    for fixture in FIXTURES:
+        fixture_dir = os.path.join(FIXTURES_DIR, fixture)
+        result = subprocess.run(
+            ["rebar3", "compile"],
+            cwd=fixture_dir,
+            capture_output=True,
+            text=True,
+            timeout=300,
+        )
+        if result.returncode != 0:
+            print(result.stdout + result.stderr, file=sys.stderr)
+            raise RuntimeError(f"Fixture compilation failed: {fixture}")
 
 
 def tearDownModule():

@@ -36,6 +36,7 @@ shell_passthrough(Executable, Args, Options) ->
             {args, Args}
         ] ++ PortOptions,
 
+    %% safe-ignore erlang:open_port/2
     Port = erlang:open_port({spawn_executable, Executable}, PortSettings),
     try
         passthrough_loop(Port)

@@ -18,7 +18,7 @@ init(State) ->
             {module, ?MODULE},
             {bare, true},
             {deps, ?DEPS},
-            {example, "rebar3 safe fingerprint | rebar3 safe analyse"},
+            {example, "rebar3 safe fingerprint | rebar3 safe analyse | rebar3 safe sca"},
             {opts, ?OPTS},
             {short_desc, "SAFE security vulnerability scanner for Erlang/Elixir projects"},
             {desc, "Runs SAFE security analysis on your Erlang/OTP or Elixir project"}
@@ -29,7 +29,7 @@ init(State) ->
 -spec do(safe_rebar_interface:state()) ->
     {ok, safe_rebar_interface:state()} | {error, string()}.
 do(State) ->
-    {ParsedOpts, _} = safe_rebar_interface:command_parsed_args_from_state(State),
+    {ParsedOpts, ExtraArgs} = safe_rebar_interface:command_parsed_args_from_state(State),
     Task = proplists:get_value(task, ParsedOpts, undefined),
     Debug = os:getenv("DEBUG") =:= "1",
     Dir = safe_rebar_interface:dir_from_state(State),
@@ -55,6 +55,8 @@ do(State) ->
             safe_cmd_version:handle(State, Dir);
         "download" ->
             safe_cmd_download:handle(State, Dir, Debug);
+        "sca" ->
+            safe_cmd_sca:handle(State, Dir, Debug, ExtraArgs);
         _ ->
             safe_print:error(
                 "Error: Unrecognised task. Use 'rebar3 safe help' for usage information."
@@ -78,6 +80,7 @@ handle_help() ->
             "TASKS:\n" ++
             "  fingerprint              Run the fingerprint phase\n" ++
             "  analyse                  Run the analysis phase\n" ++
+            "  sca                      Scan dependencies for known vulnerabilities\n" ++
             "  download                 Download the SAFE binary\n" ++
             "  version                  Print plugin and SAFE binary versions\n" ++
             "  help                     Show this help information\n\n" ++
@@ -87,5 +90,7 @@ handle_help() ->
             "  rebar3 safe download                 Download SAFE binary\n" ++
             "  rebar3 safe fingerprint              Run fingerprint\n" ++
             "  rebar3 safe analyse                  Run analysis\n" ++
+            "  rebar3 safe sca                      Scan dependencies\n" ++
+            "  rebar3 safe sca --warnings-as-errors Fail on non-hex deps\n" ++
             "  rebar3 safe version                  Show versions\n",
     io:format("~s", [Help]).

@@ -20,6 +20,8 @@ rebar3.crashdump
 *~
 .DS_Store
 tmp
+fingerprint.json
+_results/
 fixtures/**/fingerprint.json
 .vscode
 *.coverdata

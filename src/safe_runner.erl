@@ -3,7 +3,7 @@
 %% Handles execution of the installed SAFE binary.
 %% Path resolution delegates to safe_rel to avoid duplicating download-directory knowledge.
 
--export([fingerprint/2, analyse/2, version/1]).
+-export([fingerprint/2, analyse/2, version/1, sca/2]).
 
 -spec fingerprint(string(), {config_path, string()} | {config_json, string()}) ->
     ok | {error, {fingerprint, non_neg_integer()}}.
@@ -27,6 +27,18 @@ analyse(ProjectDir, ConfigSpec) ->
         ExitCode -> {error, {analyse, ExitCode}}
     end.
 
+-spec sca(string(), [string()]) -> ok | {error, {sca, non_neg_integer()}}.
+sca(ProjectDir, ExtraArgs) ->
+    % The `sca` subcommand does not accept --project-root or --config flags.
+    % Run with cd: ProjectDir so the binary auto-discovers rebar.lock/mix.lock.
+    {SafeExe, _Dir} = safe_exe_and_dir(ProjectDir),
+    Args = ["sca"] ++ ExtraArgs,
+    debug_print_command(SafeExe, Args),
+    case safe_os:shell_passthrough(SafeExe, Args, [{cd, ProjectDir}]) of
+        0 -> ok;
+        ExitCode -> {error, {sca, ExitCode}}
+    end.
+
 -spec version(string()) -> ok | {error, {version, non_neg_integer()}}.
 version(ProjectDir) ->
     {SafeExe, Dir} = safe_exe_and_dir(ProjectDir),
@@ -47,7 +59,7 @@ config_spec_to_args({config_json, Json}) -> ["--config-json", Json].
 -spec safe_exe_and_dir(string()) -> {string(), string()}.
 safe_exe_and_dir(ProjectDir) ->
     SafeExe = ensure_string(safe_rel:get_safe_binary_path(ProjectDir)),
-    Dir = filename:dirname(SafeExe),
+    Dir = ensure_string(filename:dirname(SafeExe)),
     {SafeExe, Dir}.
 
 debug_print_command(SafeExe, Args) ->

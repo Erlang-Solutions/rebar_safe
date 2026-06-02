@@ -73,6 +73,15 @@ format_error({version_failed, ExitCode}) ->
         "SAFE version command failed with exit code ~B.~nCheck the output above for details.",
         [ExitCode]
     );
+format_error(sca_vulnerabilities_found) ->
+    "SAFE SCA complete - vulnerable dependencies found. Review the output above.";
+format_error({sca_warnings_as_errors, _}) ->
+    "SAFE SCA exited with warnings treated as errors. Review the output above.";
+format_error({sca_failed, ExitCode}) ->
+    io_lib:format(
+        "SAFE SCA failed with exit code ~B.~nCheck the output above for details.",
+        [ExitCode]
+    );
 format_error({untar_failed, Reason}) ->
     io_lib:format(
         "Failed to extract SAFE archive.~nReason: ~p~nThe download may be corrupted; try again.",

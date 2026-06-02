@@ -17,7 +17,10 @@ runner_test_() ->
         fun analyse_success/0,
         fun analyse_failure/0,
         fun config_path_arg/0,
-        fun config_json_arg/0
+        fun config_json_arg/0,
+        fun sca_success/0,
+        fun sca_failure/0,
+        fun sca_extra_args/0
     ]}.
 
 fingerprint_success() ->
@@ -61,3 +64,25 @@ config_json_arg() ->
     [{_, {safe_os, shell_passthrough, [_Exe, Args, _]}, _}] = meck:history(safe_os),
     ?assert(lists:member("--config-json", Args)),
     ?assert(lists:member("{\"version\":\"1.1\"}", Args)).
+
+sca_success() ->
+    meck:expect(safe_os, shell_passthrough, fun(_Exe, _Args, _Opts) -> 0 end),
+    ?assertEqual(ok, safe_runner:sca("/fake/project", [])),
+    [{_, {safe_os, shell_passthrough, [_Exe, Args, Opts]}, _}] = meck:history(safe_os),
+    ?assert(lists:member("sca", Args)),
+    % sca does not accept --project-root; binary auto-discovers lock file via cd
+    ?assertNot(lists:member("--project-root", Args)),
+    ?assertEqual("/fake/project", proplists:get_value(cd, Opts)).
+
+sca_failure() ->
+    meck:expect(safe_os, shell_passthrough, fun(_Exe, _Args, _Opts) -> 2 end),
+    ?assertEqual(
+        {error, {sca, 2}},
+        safe_runner:sca("/fake/project", [])
+    ).
+
+sca_extra_args() ->
+    meck:expect(safe_os, shell_passthrough, fun(_Exe, _Args, _Opts) -> 0 end),
+    ok = safe_runner:sca("/fake/project", ["--warnings-as-errors"]),
+    [{_, {safe_os, shell_passthrough, [_Exe, Args, _]}, _}] = meck:history(safe_os),
+    ?assert(lists:member("--warnings-as-errors", Args)).
